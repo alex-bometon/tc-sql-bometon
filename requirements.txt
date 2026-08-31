@@ -1,0 +1,7 @@
+google-cloud-bigquery>=3.25.0
+google-auth>=2.35.0
+db-dtypes>=1.3.0
+pandas>=2.2.0
+faker>=30.0.0
+python-dotenv>=1.0.0
+pyarrow>=17.0.0
