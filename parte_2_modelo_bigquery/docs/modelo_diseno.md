@@ -44,7 +44,7 @@ La base de datos está formada por **11 tablas**.
 
 El modelo completo puede consultarse en el diagrama ER generado para el proyecto:
 
-![Diagrama entidad-relación de SkeletIA](er_diagram.png)
+![Diagrama entidad-relación de SkeletIA](skeletia_er.png)
 
 El diagrama muestra las tablas, sus campos, las claves primarias y foráneas y las cardinalidades entre las distintas entidades.
 
@@ -64,9 +64,9 @@ Esta separación permite mantener las responsabilidades de cada tabla bien delim
 
 ---
 
-# 5. Descripción de las tablas
+## 5. Descripción de las tablas
 
-## 5.1 `countries`
+### 5.1 `countries`
 
 Representa los países utilizados por el sistema.
 
@@ -88,7 +88,7 @@ Un país puede tener muchas ciudades y cada ciudad pertenece a un único país.
 
 ---
 
-## 5.2 `cities`
+### 5.2 `cities`
 
 Representa las ciudades disponibles en el modelo.
 
@@ -112,7 +112,7 @@ Esto permite que dos países diferentes puedan tener ciudades con el mismo nombr
 
 ---
 
-## 5.3 `acquisition_channels`
+### 5.3 `acquisition_channels`
 
 Representa el canal mediante el que un cliente fue adquirido.
 
@@ -142,7 +142,7 @@ Separar los canales en una tabla propia facilita posteriormente analizar el rend
 
 ---
 
-## 5.4 `categories`
+### 5.4 `categories`
 
 Representa las categorías del catálogo.
 
@@ -164,7 +164,7 @@ El nombre de la categoría no se almacena directamente en `products`; se utiliza
 
 ---
 
-## 5.5 `brands`
+### 5.5 `brands`
 
 Representa las marcas de los productos.
 
@@ -183,7 +183,7 @@ Una marca puede tener muchos productos y cada producto pertenece a una única ma
 
 ---
 
-## 5.6 `customers`
+### 5.6 `customers`
 
 Representa los clientes registrados.
 
@@ -213,7 +213,7 @@ En `customers` no se repiten el nombre del país, el nombre de la ciudad ni el n
 
 ---
 
-## 5.7 `products`
+### 5.7 `products`
 
 Representa el catálogo actual de SkeletIA.
 
@@ -242,13 +242,13 @@ products 1 ───── N order_items
 
 Es importante distinguir entre los valores actuales del catálogo y los valores históricos de una venta concreta.
 
-`current_sale_price` y `current_cost` representan únicamente el estado actual del producto.
+`current_sale_price` y `current_cost` representan únicamente el valor y coste actual del producto.
 
 Los precios y costes históricos se almacenan en `order_items`.
 
 ---
 
-## 5.8 `orders`
+### 5.8 `orders`
 
 Representa la cabecera de cada pedido.
 
@@ -270,12 +270,12 @@ Representa la cabecera de cada pedido.
 Los estados admitidos en el modelo son:
 
 ```text
-pending
 confirmed
-shipped
-delivered
 cancelled
-returned
+delivered
+pending
+return
+shipped
 ```
 
 Las relaciones principales son:
@@ -292,7 +292,7 @@ En el alcance actual del proyecto se genera además un pago por cada pedido.
 
 ---
 
-## 5.9 `order_items`
+### 5.9 `order_items`
 
 Representa las líneas de pedido.
 
@@ -334,7 +334,7 @@ Si se compran varias unidades del mismo producto dentro de un pedido, se increme
 
 ---
 
-## 5.10 `payments`
+### 5.10 `payments`
 
 Representa el proceso de pago asociado a los pedidos.
 
@@ -352,19 +352,21 @@ Representa el proceso de pago asociado a los pedidos.
 Métodos de pago definidos:
 
 ```text
-card
-paypal
-bank_transfer
 apple_pay
+bank_transfer
+card
+cash_on_delivery
 google_pay
+paypal
+samsung_pay
 ```
 
 Estados de pago definidos:
 
 ```text
-pending
 completed
 failed
+pending
 refunded
 ```
 
@@ -374,7 +376,7 @@ Esta regla se valida durante la generación de datos.
 
 ---
 
-## 5.11 `reviews`
+### 5.11 `reviews`
 
 Representa las valoraciones realizadas sobre productos comprados.
 
@@ -400,7 +402,7 @@ No se almacenan directamente `product_id`, `order_id` ni `customer_id`, porque e
 
 ---
 
-# 6. Relaciones y cardinalidades
+## 6. Relaciones y cardinalidades
 
 | Entidad origen | Relación | Entidad destino | Significado |
 |---|---|---|---|
@@ -420,9 +422,9 @@ La relación N:M entre `orders` y `products` se resuelve mediante `order_items`.
 
 ---
 
-# 7. Decisiones principales de diseño
+## 7. Decisiones principales de diseño
 
-## 7.1 Uso de `order_items` como entidad asociativa
+### 7.1 Uso de `order_items` como entidad asociativa
 
 La existencia de `order_items` es una decisión central del modelo.
 
@@ -447,7 +449,7 @@ Estos valores describen la compra concreta y no pertenecen únicamente al pedido
 
 ---
 
-## 7.2 Separación entre valores actuales e históricos
+### 7.2 Separación entre valores actuales e históricos
 
 El modelo distingue deliberadamente entre:
 
@@ -477,7 +479,7 @@ La justificación detallada respecto a las formas normales se desarrolla en [`no
 
 ---
 
-## 7.3 Descuento a nivel de línea
+### 7.3 Descuento a nivel de línea
 
 `discount_percent` se almacena en `order_items`.
 
@@ -495,7 +497,7 @@ y no a `products`.
 
 ---
 
-## 7.4 Snapshot de la dirección de envío
+### 7.4 Snapshot de la dirección de envío
 
 `orders` mantiene:
 
@@ -518,7 +520,7 @@ Por tanto, la dirección de envío es información propia del pedido.
 
 ---
 
-## 7.5 Normalización geográfica
+### 7.5 Normalización geográfica
 
 Aunque el pedido almacena un snapshot de la dirección, la ciudad se representa mediante:
 
@@ -542,7 +544,7 @@ Esto permite conservar la información histórica sin duplicar innecesariamente 
 
 ---
 
-## 7.6 `reviews` vinculada a `order_items`
+### 7.6 `reviews` vinculada a `order_items`
 
 Una valoración no se asocia directamente a `product_id`.
 
@@ -566,11 +568,11 @@ sin repetirlos en `reviews`.
 
 Esto evita inconsistencias y permite comprobar que la valoración corresponde a un producto realmente comprado.
 
-En los datos sintéticos las reviews se generan únicamente para líneas pertenecientes a pedidos entregados.
+En los datos creados con Python las reviews se generan únicamente para líneas pertenecientes a pedidos entregados.
 
 ---
 
-## 7.7 Separación de `payments` y `orders`
+### 7.7 Separación de `payments` y `orders`
 
 La información del pago se mantiene separada de `orders`.
 
@@ -595,7 +597,7 @@ Esta estructura permite que el modelo pueda evolucionar posteriormente hacia esc
 
 ---
 
-## 7.8 El total del pedido no se almacena como columna
+### 7.8 El total del pedido no se almacena como columna
 
 No existe:
 
@@ -608,8 +610,8 @@ porque el total comercial puede calcularse mediante:
 ```text
 SUM(
     quantity
-    × unit_price
-    × (1 - discount_percent / 100)
+    * unit_price
+    * (1 - discount_percent / 100)
 )
 + shipping_cost
 ```
@@ -624,7 +626,7 @@ Durante la generación se comprueba que el importe del pago coincide con el tota
 
 ---
 
-## 7.9 Claves sustitutas
+### 7.9 Claves sustitutas
 
 Las tablas utilizan identificadores numéricos como:
 
@@ -644,7 +646,7 @@ Los identificadores naturales relevantes se siguen validando como únicos.
 
 ---
 
-## 7.10 Datos maestros frente a dominios técnicos
+### 7.10 Datos maestros frente a dominios técnicos
 
 Se han creado tablas independientes para entidades como:
 
@@ -672,7 +674,7 @@ No se crean tablas adicionales para estos valores porque, dentro del alcance act
 
 ---
 
-# 8. Decisiones de tipos de datos
+## 8. Decisiones de tipos de datos
 
 La implementación final utiliza los tipos de BigQuery.
 
@@ -690,7 +692,7 @@ Durante la generación en Python se utiliza `Decimal` para evitar errores de pre
 
 ---
 
-# 9. Integridad de los datos
+## 9. Integridad de los datos
 
 Debido a las características de BigQuery, las PK y FK declaradas actúan como restricciones lógicas y no deben considerarse suficientes por sí solas para garantizar toda la integridad del conjunto de datos.
 
@@ -714,7 +716,7 @@ La separación entre **modelo lógico** y **validación efectiva** es especialme
 
 ---
 
-# 10. Reglas temporales
+## 10. Reglas temporales
 
 Las fechas generadas deben respetar el orden lógico de los eventos.
 
@@ -747,7 +749,7 @@ Estas reglas garantizan que los datos sintéticos representen una secuencia de n
 
 ---
 
-# 11. Reglas económicas
+## 11. Reglas económicas
 
 Se aplican reglas básicas como:
 
@@ -776,7 +778,7 @@ Los pagos se calculan utilizando los precios históricos de las líneas y el des
 
 ---
 
-# 12. Generación de datos sintéticos
+## 12. Generación de datos sintéticos
 
 La generación se realiza en Python utilizando `Faker`.
 
@@ -811,7 +813,7 @@ payments / reviews
 
 ---
 
-# 13. DataFrames como capa intermedia
+## 13. DataFrames como capa intermedia
 
 Cada tabla dispone de su correspondiente `DataFrame` de pandas.
 
@@ -833,7 +835,7 @@ Esto permite detectar errores antes de que lleguen a la base de datos.
 
 ---
 
-# 14. Estrategia de carga en BigQuery
+## 14. Estrategia de carga en BigQuery
 
 Las tablas se cargan respetando el orden de sus dependencias:
 
@@ -861,7 +863,7 @@ De esta manera se verifica que la carga se ha realizado completamente.
 
 ---
 
-# 15. Gestión de credenciales y configuración
+## 15. Gestión de credenciales y configuración
 
 La configuración del proyecto se mantiene separada del código mediante variables de entorno.
 
@@ -871,7 +873,7 @@ El fichero:
 .env
 ```
 
-contiene los valores reales necesarios para la ejecución local y no debe subirse al repositorio.
+contiene los valores reales necesarios para la ejecución local y no está subido al repositorio.
 
 El proyecto incluye:
 
@@ -881,13 +883,13 @@ El proyecto incluye:
 
 como plantilla de configuración.
 
-Las credenciales de Google Cloud tampoco se versionan.
+Las credenciales de Google Cloud tampoco se incluyen.
 
 Esta separación evita incluir información sensible directamente dentro de los notebooks.
 
 ---
 
-# 16. Reproducibilidad
+## 16. Reproducibilidad
 
 El proyecto se estructura en notebooks independientes:
 
@@ -915,7 +917,7 @@ Cada notebook debe poder crear su propia conexión a BigQuery a partir de la con
 
 ---
 
-# 17. Decisiones de simplificación del alcance
+## 17. Decisiones de simplificación del alcance
 
 El modelo busca representar correctamente el negocio requerido sin introducir entidades que no sean necesarias para el alcance actual.
 
@@ -927,7 +929,7 @@ Estas decisiones reducen la complejidad sin eliminar información necesaria para
 
 ---
 
-# 18. Capacidad de análisis del modelo
+## 18. Capacidad de análisis del modelo
 
 La estructura permite realizar consultas analíticas cruzando las distintas áreas del negocio.
 
@@ -952,7 +954,7 @@ Esto permite comprobar que el diseño no solo es estructuralmente consistente, s
 
 ---
 
-# 19. Relación con la documentación de normalización
+## 19. Relación con la documentación de normalización
 
 Las decisiones recogidas en este documento están estrechamente relacionadas con la normalización del modelo.
 
@@ -980,7 +982,7 @@ Ambos documentos tienen funciones diferentes:
 
 ---
 
-# 20. Conclusión
+## 20. Conclusión
 
 El modelo de SkeletIA se ha diseñado para mantener separadas las distintas responsabilidades del negocio:
 
